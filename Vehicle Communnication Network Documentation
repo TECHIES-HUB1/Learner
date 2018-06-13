@@ -1,0 +1,71 @@
+=========>    Vehicle Communnication Network Documentation    <=========
+taking Transceiver script as case study
+
+Each Vehicle is equipped with a transceiver device capable of transmitting and receiving data from other transceivers from other vehicles (in this case Dr12 from CubicTek.co LTD).
+
+The code for each transceiver device is written purely in Lua scripting language and all the inclusive function used in the transceiver device with their respective functionalities along with their usage in the context are listed below.
+
+1)  objectExistsInTable() : function to check if element exists in a table.
+	Used on lines: 187 to check if a node has previously been indexed so as to avoid redundant indexing.
+	               278 to index foward ant node indexing during foward ants cluster formation.
+
+2)	getDistance() : function to get distance between two coordinates or two entities.
+	Used on lines: 212 to get the shortest distance between source node and destination node.
+
+3)	getObjectHandles() : function to get object handles and store it in a table.
+	Used on lines: 191 to obtain the handles of all indexed nodes during cluster formation.
+				   279 to obtain the handles of all indexed fants.
+
+4)	getDestinationHandle() : function to get destination handle through packetData name
+	Used on lines: 194 to get the packet data destination handle when packet data is initialized.
+				   280 to get the packet data destination handle when packet data is received by a node.
+
+5)	getDistanceBetweenObjectsAndDestination() : function to get the shortest distance between nodes and the packet data destination.
+	Used on lines: 209 to get the shortest distance between nodes in cluster and the destination through their gps co-ordinates.
+
+6)	isDestinationInNeighbourHood() : function to check if destination node is in the cluster.
+	Used on lines: 197 used by arrow head node to check if the packet data destination node is within transmission range.
+				   284 used by foward ants to check if the packet data destination node is within transmission range.
+
+7)	getFantSenderIdFromFantMessage() : function to get the name of the node that sent a foward ant.
+	Used on lines: 263 used by a foward ant to get the name of the node that sent the foward ant.
+				   318 used by a backward ant to get the name of the node that sent the backward ant.
+
+8)	isPacketDataInCorrespondingPacketNameTable() : function to check if a particular destination node exist in the ph table.
+	Used on lines: 331 by a node when it receives a packet data to check if there exist a ph value for the destination node of that packet data.
+				   371 to dectet which node is the optimized node to route through.
+
+9)	getFantSenderIndex() : function to get the fant sender of the bant of a particular packet data
+	Used on lines: 332 to get the sender of a backward ant.
+				   372 to get the sender of a backward ant.
+
+10)	getDetailsFromReceivedPacketData() : function to get details from received packet data message.
+	Used on lines: 370 to get packet data and sender id from received packet data message.
+
+
+
+=========>    How it Works
+
+Each nodes exhibits a life cycle which iterates through four(4) states which is continuously altered by reception and transmission of data, these states are:
+
+1) State 1 => Cluster Formation
+
+2) State 2 => listen for fants
+
+3) State 3 => listen for bants
+
+4) State 4 => listen for packet data
+
+
+
+=========>     Graph data generation for cluster formation duration.
+
+*** On line "163" before cluster formation begins, the current time is initialized using the function "simGetSimulationTime()" and stored in the variable "clusterFormationTimeInit" 
+*** Also, on line "191" after cluster formation, the final cluster formation is gotten again using the function "simGetSimulationTime()" and stored in the variable "clusterFormationTimeFinal".
+*** Then on line "192" the initial time (clusterFormationTimeInit) is then subtracted from the final cluster formation time clusterFormationTimeFinal) in the expression "clusterFormationDuration = clusterFormationTimeFinal - clusterFormationTimeInit" and stored in the variable "clusterFormationDuration".
+
+
+=========>    Graph data generation for recovery of stuck node.
+
+A node gets stuck on line "227" when there is zero node(s) in the optimized direction of the packet data transmission.
+At that point, the initial time is gotten and stored in "initFantTime" variable, fants are deployed and when a fant encounters the destination node, it sends back a bant. When this bant reaches the stuck node, the final node recovery time is gotten and stored in "finalFantTime" on line "324" and the recovery time is then calculated by subtracting the initial time from the final time on line "325"
